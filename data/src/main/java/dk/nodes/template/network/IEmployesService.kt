@@ -1,9 +1,6 @@
 package dk.nodes.template.network
 
-import dk.nodes.template.models.Departments
-import dk.nodes.template.models.DepartmentsInfo
-import dk.nodes.template.models.Employee
-import dk.nodes.template.models.EmployeesList
+import dk.nodes.template.models.*
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -22,7 +19,16 @@ interface IEmployesService {
     @Headers("Content-Type: application/json")
     @PUT("hr/v1/employees/{id}")
     fun sendEmployee(@HeaderMap headers: Map<String, String>,@Path("id") id: Int,
-                     @Body body :String): Call<String>
+                     @Body body :UpdateEmployee): Call<String>
 
 
+
+    @Headers("Content-type: application/json")
+    @PUT("hr/v1/employees/{id}")
+    fun updateEmployee(
+            @Path("id") userId: Int,
+            @Body body: UpdateEmployee,
+            @Header("X-ClientId") client_id: String,
+            @Header("Authorization") auth: String
+    ): Call<Unit>
 }

@@ -114,13 +114,13 @@ class RestModule {
 
 
     @Provides
-    fun provideWeatherService(@RetrofitApi r: Retrofit): IEmployesService {
+    fun provideEmployeeService(@RetrofitApi r: Retrofit): IEmployesService {
         return r.create<IEmployesService>(IEmployesService::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideMovieService(retrofit: Retrofit): IAutService {
+    fun provideAuth(retrofit: Retrofit): IAutService {
         return retrofit.create<IAutService>(IAutService::class.java)
     }
 

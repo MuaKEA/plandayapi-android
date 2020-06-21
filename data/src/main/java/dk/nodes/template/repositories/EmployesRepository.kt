@@ -3,10 +3,7 @@ package dk.nodes.template.repositories
 import android.content.SharedPreferences
 import android.util.Log
 import com.google.gson.Gson
-import dk.nodes.template.models.Departments
-import dk.nodes.template.models.DepartmentsInfo
-import dk.nodes.template.models.EditedEmployee
-import dk.nodes.template.models.Employee
+import dk.nodes.template.models.*
 import dk.nodes.template.network.IEmployesService
 import java.util.ArrayList
 import javax.inject.Inject
@@ -25,8 +22,6 @@ class EmployesRepository @Inject constructor(private val iEmployesService: IEmpl
             mapHeader.put("Authorization", "Bearer $authToken")
         }
         return mapHeader
-
-
     }
 
 
@@ -90,13 +85,12 @@ class EmployesRepository @Inject constructor(private val iEmployesService: IEmpl
 
     suspend fun sendEmployee(employee: EditedEmployee): Unit?{
 
-        var employeeHasmap = HashMap<String,String>()
-        employeeHasmap.put("firstName",employee.firstName)
-        employeeHasmap.put("lastName", employee.lastName)
-        employeeHasmap.put("gender", employee.gender)
+       var updatedemployee = UpdateEmployee(employee.firstName,employee.lastName,employee.gender)
 
 
-        val response = iEmployesService.sendEmployee(getHeader(),employee.id,gson.toJson(employeeHasmap)).execute()
+
+
+        val response = iEmployesService.updateEmployee(employee.id,updatedemployee,"d2cc153a-3ad4-42b0-b832-43ee335e5ea5",getHeader().get("Authorization").toString()).execute()
 
         if (response.isSuccessful) {
             var message = response.body()
