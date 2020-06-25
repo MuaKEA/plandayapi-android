@@ -5,11 +5,18 @@ apply plugin: 'kotlin-kapt'
 android {
     compileSdkVersion sdks.compileSdkVersion
     buildToolsVersion sdks.buildToolsVersion
+    def keystorePropertiesFile = rootProject.file("keystore.properties")
+    def keystoreProperties = new Properties()
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
     defaultConfig {
         minSdkVersion sdks.minSdkVersion
         targetSdkVersion sdks.targetSdkVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
+        // Create BuildConfig variables
+        buildConfigField "String", "client_id", keystoreProperties["client_id"]
+        buildConfigField "String", "refresh_token", keystoreProperties["refresh_token"]
     }
 
     buildTypes {

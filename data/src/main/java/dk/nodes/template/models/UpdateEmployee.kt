@@ -8,11 +8,9 @@ data class UpdateEmployee (
         @SerializedName("firstName")
         @Expose
         var firstName: String? = null,
-
         @SerializedName("lastName")
         @Expose
         var lastName: String? = null,
-
         @SerializedName("gender")
         @Expose
         var gender: String? = null

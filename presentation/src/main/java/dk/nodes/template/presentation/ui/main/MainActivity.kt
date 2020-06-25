@@ -3,6 +3,8 @@ package dk.nodes.template.presentation.ui.main
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import dk.nodes.template.models.DepartmentsInfo
 import dk.nodes.template.models.Employee
@@ -10,6 +12,7 @@ import dk.nodes.template.presentation.R
 import dk.nodes.template.presentation.extensions.observeNonNull
 import dk.nodes.template.presentation.ui.base.BaseActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import kotlin.collections.ArrayList
 
@@ -27,8 +30,10 @@ class MainActivity : BaseActivity() {
         viewModel.fetchEmployes()
         viewModel.fetchDepartments()
 
-        adapter = EmployeesAdapter(this, R.layout.employees_row)
+        loadingbar.isEnabled= true
 
+
+        adapter = EmployeesAdapter(this, R.layout.employees_row)
         adapter?.onItemClickedListener = { employee ->
 
             editemployeeItent = Intent(this, EditEmployeeActivity::class.java)
@@ -39,6 +44,15 @@ class MainActivity : BaseActivity() {
         viewModel.viewState.observeNonNull(this) { state ->
             fetchemployee(state)
             fetchdepartments(state)
+            handleError(state)
+        }
+
+
+    }
+
+    private fun handleError(state: MainActivityViewState) {
+        state.viewError?.let { error->
+        Toast.makeText(this,"Error something went wrong" , Toast.LENGTH_LONG).show()
         }
 
     }
@@ -73,8 +87,18 @@ class MainActivity : BaseActivity() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        viewModel.fetchEmployes()
+        viewModel.fetchDepartments()
+
+
+    }
+
     private fun fetchemployee(viewState: MainActivityViewState) {
         viewState.employyeList?.let { employeedata ->
+            loadingbar.visibility = View.GONE;
             employeesList = employeedata
             adapter?.addemployeesList(employeedata)
             Timber.e(employeedata.size.toString())

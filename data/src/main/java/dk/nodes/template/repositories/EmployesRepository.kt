@@ -5,28 +5,32 @@ import android.util.Log
 import com.google.gson.Gson
 import dk.nodes.template.models.*
 import dk.nodes.template.network.IEmployesService
+import dk.nodes.template.presentation.BuildConfig
+import kotlinx.coroutines.delay
+import java.io.IOException
 import java.util.ArrayList
 import javax.inject.Inject
 
 class EmployesRepository @Inject constructor(private val iEmployesService: IEmployesService,
-                                             private val sharedPreferences: SharedPreferences,
-                                             private val gson : Gson) {
+                                             private val sharedPreferences: SharedPreferences) {
 
 
     fun getHeader(): HashMap<String, String> {
         val mapHeader = HashMap<String, String>()
         val authToken = sharedPreferences.getString("access_token", null)
-
         if (authToken != null) {
-            mapHeader.put("X-ClientId", "d2cc153a-3ad4-42b0-b832-43ee335e5ea5")
+            mapHeader.put("X-ClientId", BuildConfig.client_id)
             mapHeader.put("Authorization", "Bearer $authToken")
         }
+
         return mapHeader
     }
 
 
     suspend fun fetchemployees(): ArrayList<Employee> {
-        var employyeList = ArrayList<Employee>()
+
+        val employyeList = ArrayList<Employee>()
+        delay(2000)
 
         val response = iEmployesService.fetchEmployees(getHeader()).execute()
 
@@ -40,17 +44,18 @@ class EmployesRepository @Inject constructor(private val iEmployesService: IEmpl
 
             }
 
-            }
+        }
 
-            return employyeList
-
-
+        return employyeList
 
 
     }
 
 
-        suspend fun fetchFromId(id: Int): Employee?{
+
+
+
+    suspend fun fetchFromId(id: Int): Employee? {
 
         val response = iEmployesService.fetchEmployeesById(getHeader(), id).execute()
 
@@ -63,15 +68,14 @@ class EmployesRepository @Inject constructor(private val iEmployesService: IEmpl
         return null
     }
 
-    suspend fun fetchDepartementNames(): ArrayList<DepartmentsInfo>{
+    suspend fun fetchDepartementNames(): ArrayList<DepartmentsInfo> {
+        delay(2000)
 
         val response = iEmployesService.fetchDepartmentNames(getHeader()).execute()
         val departmentList = ArrayList<DepartmentsInfo>()
-        Log.d("Logoso","1")
 
         if (response.isSuccessful) {
             val message = response.body()
-            Log.d("Logoso","1")
 
             if (message != null) {
 
@@ -83,22 +87,23 @@ class EmployesRepository @Inject constructor(private val iEmployesService: IEmpl
         return departmentList
     }
 
-    suspend fun sendEmployee(employee: EditedEmployee): Unit?{
+    suspend fun sendEmployee(employee: EditedEmployee): Unit? {
 
-       var updatedemployee = UpdateEmployee(employee.firstName,employee.lastName,employee.gender)
+        val headers = getHeader()
 
+        headers.put(" Content-type", "application/json")
 
-
-
-        val response = iEmployesService.updateEmployee(employee.id,updatedemployee,"d2cc153a-3ad4-42b0-b832-43ee335e5ea5",getHeader().get("Authorization").toString()).execute()
+        val response = iEmployesService.updateEmployee(employee.id, UpdateEmployee(employee.firstName, employee.lastName, employee.gender), BuildConfig.client_id, getHeader().get("Authorization").toString()).execute()
 
         if (response.isSuccessful) {
-            var message = response.body()
-            if (message != null) {
-                return null
-            }
+
+            return null
+
+        } else {
+
+            throw Exception()
         }
-        return null
+
     }
 }
 
